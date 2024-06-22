@@ -321,6 +321,11 @@ func (lista *ListaDeRutinas) GeneracionAutomagica2(nombre string, caloriasObjeti
 		}
 	}
 
+	// Verificar si se alcanzaron las calorías objetivo
+	if caloriasAcumuladas < caloriasObjetivo {
+		return nil, errors.New("no es posible alcanzar las calorías objetivo con los ejercicios disponibles")
+	}
+
 	lista.AgregarRutina(nombre,rutinaEjercicios)
 	rutina,_:= lista.ConsultarRutina(nombre)
 
