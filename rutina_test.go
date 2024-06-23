@@ -248,7 +248,7 @@ func TestGeneracionAutomagica2_Exito(t *testing.T) {
 	listaEjercicios := NewListaDeEjercicios()
 
 	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 15, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
 	listaEjercicios.AgregarEjercicio("sentadillas", "descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
 	listaEjercicios.AgregarEjercicio("estocadas", "descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
 
@@ -259,7 +259,7 @@ func TestGeneracionAutomagica2_Exito(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verificar la duración de la rutina y el número de ejercicios
-	assert.Equal(t, 30, rutina.Duracion, "la duración no es igual a la duración total de los ejercicios disponibles")
+	assert.Equal(t, 25, rutina.Duracion, "la duración no es igual a la duración total de los ejercicios disponibles")
 	assert.Equal(t, 2, len(rutina.EjerciciosTotales), "el número de ejercicios en la rutina no es correcto")
 	assert.Equal(t, 140, rutina.CaloriasQuemadasTotales, "el número de ejercicios en la rutina no es correcto")
 }
