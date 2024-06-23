@@ -52,9 +52,9 @@ func TestAgregarRutina(t *testing.T) {
 
 	ejerciciosFiltrados,_:= listaEjercicios.ListarEjercicios()
 	// prueba con nombre de rutina duplicado
-	lista.AgregarRutina("Rutina1", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina1", ejerciciosFiltrados)
 	rutinaAConsultar,_:=lista.ConsultarRutina("Rutina1")
-	assert.Equal(t, "Rutina1", rutinaAConsultar.Nombre)
+	assert.Equal(t, "rutina1", rutinaAConsultar.Nombre)
 }
 
 func TestBorrarRutina(t *testing.T) {
@@ -68,15 +68,15 @@ func TestBorrarRutina(t *testing.T) {
 
 	ejerciciosFiltrados,_:= listaEjercicios.ListarEjercicios()
 	// prueba con nombre de rutina duplicado
-	lista.AgregarRutina("Rutina1", ejerciciosFiltrados)
-	lista.AgregarRutina("Rutina2", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina1", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina2", ejerciciosFiltrados)
 
 	// eliminando una rutina existente
-	lista.BorrarRutina("Rutina1")
+	lista.BorrarRutina("rutina1")
 	// Listar las rutinas
 	rutinasListadas,_:=lista.ListarRutinas()
 	assert.Equal(t, 1,len(rutinasListadas))
-	assert.Equal(t, "Rutina2",rutinasListadas[0].Nombre)
+	assert.Equal(t, "rutina2",rutinasListadas[0].Nombre)
 }
 
 func TestConsultarRutina(t *testing.T) {
@@ -90,12 +90,12 @@ func TestConsultarRutina(t *testing.T) {
 
 	ejerciciosFiltrados,_:= listaEjercicios.ListarEjercicios()
 	// prueba con nombre de rutina duplicado
-	lista.AgregarRutina("Rutina1", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina1", ejerciciosFiltrados)
 
 	// consultar una rutina existente
 	rutina, err := lista.ConsultarRutina("Rutina1")
 	assert.NoError(t, err, "No se esperaba un error al consultar la rutina 1")
-	assert.Equal(t, "Rutina1", rutina.Nombre, "El nombre de la rutina no coincide")
+	assert.Equal(t, "rutina1", rutina.Nombre, "El nombre de la rutina no coincide")
 }
 
 func TestModificarRutina(t *testing.T) {
@@ -103,19 +103,19 @@ func TestModificarRutina(t *testing.T) {
 	listaEjercicios := NewListaDeEjercicios()
 
 	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "intermedio")
-	listaEjercicios.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "intermedio")
+	listaEjercicios.AgregarEjercicio("sentadillas", "descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("estocadas", "descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
 
 	ejerciciosFiltrados,_:= listaEjercicios.ListarEjercicios()
 	// prueba con nombre de rutina duplicado
-	lista.AgregarRutina("Rutina1", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina1", ejerciciosFiltrados)
 	// Borramos un sjercicio de la lista de ejercicios y modificamos la rutina con la nuevaListaDeEjercicios
-	listaEjercicios.BorrarEjercicio("Sentadillas")
+	listaEjercicios.BorrarEjercicio("sentadillas")
 	nuevosEjercicios,_:=listaEjercicios.ListarEjercicios()
 
-	lista.ModificarRutina("Rutina1", nuevosEjercicios)
-	rutinaModificada,_ :=lista.ConsultarRutina("Rutina1")
+	lista.ModificarRutina("rutina1", nuevosEjercicios)
+	rutinaModificada,_ :=lista.ConsultarRutina("rutina1")
 	assert.Equal(t, 2, len(rutinaModificada.EjerciciosTotales)) // Debería ser 2, ya que eran 3, pero luego se modificó con sólo 2 ejercicios
 }
 
@@ -124,19 +124,19 @@ func TestListarRutinas(t *testing.T) {
 	listaEjercicios := NewListaDeEjercicios()
 
 	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "intermedio")
-	listaEjercicios.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "intermedio")
+	listaEjercicios.AgregarEjercicio("sentadillas", "descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("estocadas", "descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
 
 	ejerciciosFiltrados,_:= listaEjercicios.ListarEjercicios()
 	// prueba con nombre de rutina duplicado
-	lista.AgregarRutina("Rutina1", ejerciciosFiltrados)
-	lista.AgregarRutina("Rutina2", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina1", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina2", ejerciciosFiltrados)
 
 	// listar con 2 rutinas
 	rutinas,_:= lista.ListarRutinas()
 	assert.Equal(t, 2, len(rutinas), "Se esperaba una lista de rutinas con dos elementos")
-	assert.Equal(t, "Rutina1", rutinas[0].Nombre)
+	assert.Equal(t, "rutina1", rutinas[0].Nombre)
 }
 
 // VERIFICA EL BORRADO DE UNA RUTINA ACTUAL
@@ -145,19 +145,19 @@ func TestBorrarRutinaExistente(t *testing.T) {
 	listaEjercicios := NewListaDeEjercicios()
 
 	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "intermedio")
-	listaEjercicios.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "intermedio")
+	listaEjercicios.AgregarEjercicio("sentadillas", "descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("estocadas", "descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
 
 	ejerciciosFiltrados,_:= listaEjercicios.ListarEjercicios()
 	// prueba con nombre de rutina duplicado
-	lista.AgregarRutina("Rutina1", ejerciciosFiltrados)
-	lista.AgregarRutina("Rutina2", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina1", ejerciciosFiltrados)
+	lista.AgregarRutina("rutina2", ejerciciosFiltrados)
 	// Borrar la Rutina2
-	lista.BorrarRutina("Rutina2")
+	lista.BorrarRutina("rutina2")
 	rutinas,_:= lista.ListarRutinas()
 	assert.Equal(t, 1, len(rutinas), "Se esperaba una lista de rutinas con un elemento")
-	assert.Equal(t, "Rutina1", rutinas[0].Nombre)
+	assert.Equal(t, "rutina1", rutinas[0].Nombre)
 
 }
 
@@ -191,7 +191,7 @@ func TestAgregarEjercicioARutinaExistente(t *testing.T) {
 	ejercicioAAgregar,_ := listaEjercicios.ConsultarEjercicioPorNombre("Saltar la soga")
 	lista.AgregarEjercicioARutina("Rutina1",ejercicioAAgregar)
 	assert.Equal(t, 4,len(rutinaAConsultar.EjerciciosTotales)) // Debería tener 4 ejercicios, al haber agregado Saltar la soga
-	assert.Equal(t, "Saltar la soga",rutinaAConsultar.EjerciciosTotales[3].Nombre) // Debería tener 4 ejercicios, al haber agregado Saltar la soga
+	assert.Equal(t, "saltar la soga",rutinaAConsultar.EjerciciosTotales[3].Nombre) // Debería tener 4 ejercicios, al haber agregado Saltar la soga
 
 }
 
@@ -202,16 +202,16 @@ func TestGeneracionAutomagica_Exito(t *testing.T) {
 	listaEjercicios := NewListaDeEjercicios()
 
 	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("sentadillas", "descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("estocadas", "descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
 
 	// Llamar a la función GeneracionAutomagica
-	rutina, _ := lista.GeneracionAutomagica("RutinaAutomagica1", 30, "fuerza", "principiante", listaEjercicios)
+	rutina, _ := lista.GeneracionAutomagica("rutinaAutomagica1", 30, "fuerza", "principiante", listaEjercicios)
 	// Verificar que la duración de la rutina sea correcta: 20+10 y que tenga 2 ejercicios:Flexiones de brazos y Sentadillas
-	assert.Equal(t, 30, rutina.Duracion, "La duración no es igual a la duración total de los ejercicios disponibles")
-	assert.Equal(t, "Flexiones de brazos", rutina.EjerciciosTotales[0].Nombre)
-	assert.Equal(t, "Sentadillas", rutina.EjerciciosTotales[1].Nombre)
+	assert.Equal(t, 30, rutina.Duracion, "la duración no es igual a la duración total de los ejercicios disponibles")
+	assert.Equal(t, "flexiones de brazos", rutina.EjerciciosTotales[0].Nombre)
+	assert.Equal(t, "sentadillas", rutina.EjerciciosTotales[1].Nombre)
 }
 
 func TestGeneracionAutomagica_Error_TipoEjercicioInexistente(t *testing.T) {
@@ -248,19 +248,21 @@ func TestGeneracionAutomagica2_Exito(t *testing.T) {
 	listaEjercicios := NewListaDeEjercicios()
 
 	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("sentadillas", "descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	listaEjercicios.AgregarEjercicio("estocadas", "descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
 
 	// Llamar a la función GeneracionAutomagica2
-	rutina, _ := lista.GeneracionAutomagica2("RutinaAutomagica2", 140, listaEjercicios)
-	// Verificar que la duración de la rutina sea correcta: 20+10 y que tenga 2 ejercicios:Flexiones de brazos y Sentadillas
-	assert.Equal(t, 30, rutina.Duracion, "La duración no es igual a la duración total de los ejercicios disponibles")
-	assert.Equal(t, "Flexiones de brazos", rutina.EjerciciosTotales[0].Nombre)
-	assert.Equal(t, "Sentadillas", rutina.EjerciciosTotales[1].Nombre)
-	assert.Equal(t, 140, rutina.CaloriasQuemadasTotales)
-}
+	rutina, err := lista.GeneracionAutomagica2("rutinaAutomagica2", 140, listaEjercicios)
 
+	// Verificar que no haya error
+	assert.NoError(t, err)
+
+	// Verificar la duración de la rutina y el número de ejercicios
+	assert.Equal(t, 30, rutina.Duracion, "la duración no es igual a la duración total de los ejercicios disponibles")
+	assert.Equal(t, 2, len(rutina.EjerciciosTotales), "el número de ejercicios en la rutina no es correcto")
+	assert.Equal(t, 140, rutina.CaloriasQuemadasTotales, "el número de ejercicios en la rutina no es correcto")
+}
 func TestGeneracionAutomagica2_Error_CaloriasInsuficientes(t *testing.T) {
 	lista := NewListaDeRutinas()
 	listaEjercicios := NewListaDeEjercicios()

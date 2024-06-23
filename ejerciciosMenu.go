@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/gocarina/gocsv"
 )
@@ -131,6 +132,21 @@ func ConsultarEjercicioPorNombreMenu(lista *ListaDeEjercicios) {
 	}
 }
 
+// Función para normalizar Dificultad
+func NormalizeDificultad(dificultad string) Dificultad {
+	switch NormalizeString(dificultad) {
+	case NormalizeString(string(Principiante)):
+		return Principiante
+	case NormalizeString(string(Intermedio)):
+		return Intermedio
+	case NormalizeString(string(Avanzado)):
+		return Avanzado
+	default:
+		return ""
+	}
+}
+
+// Función FiltrarEjerciciosMenu
 func FiltrarEjerciciosMenu(lista *ListaDeEjercicios) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -146,21 +162,7 @@ func FiltrarEjerciciosMenu(lista *ListaDeEjercicios) {
 	fmt.Print("Ingrese la dificultad a filtrar (deje vacío para omitir): ")
 	dificultadStr, _ := reader.ReadString('\n')
 	dificultadStr = strings.TrimSpace(dificultadStr)
-	var dificultad Dificultad
-	switch dificultadStr {
-	case "":
-		dificultad = ""
-	case string(Principiante):
-		dificultad = Principiante
-	case string(Intermedio):
-		dificultad = Intermedio
-	case string(Avanzado):
-		dificultad = Avanzado
-	default:
-		fmt.Println("Dificultad inválida.")
-		return
-	}
-	
+	dificultad := NormalizeDificultad(dificultadStr)
 
 	fmt.Print("Ingrese la cantidad mínima de calorías (0 para omitir): ")
 	minCaloriasStr, _ := reader.ReadString('\n')
@@ -230,6 +232,40 @@ func ModificarEjercicioMenu(lista *ListaDeEjercicios) {
 	}
 }
 
+// normalizeString convierte una cadena a minúsculas y elimina acentos
+func NormalizeString(s string) string {
+	var sb strings.Builder
+	sb.Grow(len(s))
+
+	for _, r := range s {
+		// Convertir a minúscula
+		lr := unicode.ToLower(r)
+		// Eliminar acentos
+		if lr >= 'a' && lr <= 'z' {
+			sb.WriteRune(lr)
+		} else {
+			switch lr {
+			case 'á':
+				sb.WriteRune('a')
+			case 'é':
+				sb.WriteRune('e')
+			case 'í':
+				sb.WriteRune('i')
+			case 'ó':
+				sb.WriteRune('o')
+			case 'ú':
+				sb.WriteRune('u')
+			case 'ü':
+				sb.WriteRune('u')
+			default:
+				sb.WriteRune(r)
+			}
+		}
+	}
+
+	return sb.String()
+}
+
 func GuardarEjercicios(lista *ListaDeEjercicios) error {
 	ejercicios, err := lista.ListarEjercicios()
 	if err != nil {
@@ -239,7 +275,15 @@ func GuardarEjercicios(lista *ListaDeEjercicios) error {
 		}
 		return err
 	}
-
+	// Normalizar
+	for _, ejercicio := range ejercicios {
+		ejercicio.Nombre = NormalizeString(ejercicio.Nombre)
+		ejercicio.Descripcion = NormalizeString(ejercicio.Descripcion)
+		ejercicio.Dificultad = Dificultad(NormalizeString(string(ejercicio.Dificultad)))
+		for i, tipo := range ejercicio.TipoDeEjercicio {
+			ejercicio.TipoDeEjercicio[i] = TipoEjercicio(NormalizeString(string(tipo)))
+		}
+	}
 	// Verificar si el archivo ya existe
 	existe, err := ArchivoExiste("ejercicios.csv")
 	if err != nil {

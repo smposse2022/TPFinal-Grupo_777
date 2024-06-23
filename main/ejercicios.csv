@@ -1,7 +1,10 @@
 Nombre,Descripción,Tiempo,Calorías,Tipo de Ejercicio,Puntos por Tipo de Ejercicio,Dificultad
-Burpee,Nueva descripcion de burpee,9,12,"[""cardio""]",[14],avanzado
-Sentadillas,Descripcion de sentadillas,24,30,"[""fuerza"",""cardio""]","[13,17]",intermedio
-Carrera,Descripcion de Carrera,60,12,"[""cardio""]",[11],principiante
-Flexiones de brazos,Descripcion de flexiones de brazos,14,29,"[""fuerza""]",[40],principiante
-Estocadas,Descripcion de estocadas,30,40,"[""balance""]",[58],avanzado
-Saltar la soga,Descripcion de saltar la soga,45,60,"[""cardio""]",[30],intermedio
+estocadas,descripcion de estocadas,30,40,"[""balance""]",[58],avanzado
+press de banca inclinado,descripcion de press inclinado,60,23,"[""fuerza""]",[14],intermedio
+sentadillas,descripcion de sentadillas,24,30,"[""fuerza"",""cardio""]","[13,17]",intermedio
+press de banca,descripcion de press de banca,30,14,"[""fuerza""]",[40],intermedio
+burpee,nueva descripcion de burpee,9,12,"[""cardio""]",[14],avanzado
+dominadas,descripcion de dominadas,25,7,"[""fuerza""]",[12],avanzado
+saltar la soga,descripcion de saltar la soga,45,60,"[""cardio""]",[30],intermedio
+flexiones de brazos,descripcion de flexiones de brazos,14,29,"[""fuerza""]",[40],principiante
+carrera,descripcion de carrera,60,12,"[""cardio""]",[11],principiante

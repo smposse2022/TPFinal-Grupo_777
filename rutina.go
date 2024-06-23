@@ -2,6 +2,7 @@ package rutinaDeEjercicios
 
 import (
 	"errors"
+	"strings"
 )
 
 // Estructura de Rutina
@@ -89,12 +90,14 @@ func (lista *ListaDeRutinas) AgregarRutina(nombre string, ejerciciosTotales []*E
 	if len(ejerciciosTotales) == 0 {
 		return errors.New("una rutina debe contener al menos 1 ejercicio")
 	}
+	// Normalizar nombre
+	nombreNormalizado := NormalizeString(nombre)
 	duracionRutina := calcularDuracion(ejerciciosTotales)
 	caloriasRutina := calcularCaloriasTotales(ejerciciosTotales)
 	tipoEjerciciosRutina := calcularTipoEjercicios(ejerciciosTotales)
 	dificultadRutina := calcularDificultadEjercicios(ejerciciosTotales)
 	rutina := &Rutina{
-		Nombre:                  nombre,
+		Nombre:                  nombreNormalizado,
 		Duracion:                duracionRutina,
 		EjerciciosTotales:       ejerciciosTotales,
 		TipoDeEjercicios:        tipoEjerciciosRutina,
@@ -112,19 +115,27 @@ func (lista *ListaDeRutinas) BorrarRutina(nombre string) error {
 	if error != nil {
 		return error
 	}
-	delete(lista.listaDeRutinas, nombre)
+	// Normalizar el nombre de búsqueda
+	nombreNormalizado := NormalizeString(nombre)
+	delete(lista.listaDeRutinas, nombreNormalizado)
 	return nil
 }
 
 // ConsultarRutina busca la rutina a partir de la key indicada y devuelve la Rutina
 func (lista *ListaDeRutinas) ConsultarRutina(nombre string) (*Rutina, error) {
-	// Validar que la rutina exista
-	rutina, existe := lista.listaDeRutinas[nombre]
-	if !existe {
+		// Normalizar el nombre de búsqueda
+		nombreNormalizado := NormalizeString(nombre)
+
+		// Iterar sobre los ejercicios y buscar coincidencia parcial
+		for _, rutina := range lista.listaDeRutinas {
+			nombreRutinaNormalizado := NormalizeString(rutina.Nombre)
+			if strings.Contains(nombreRutinaNormalizado, nombreNormalizado) {
+				return rutina, nil
+			}
+		}
+	
 		return nil, errors.New("la rutina no existe")
 	}
-	return rutina, nil
-}
 
 // ModificarRutina permite modificar los valores de una rutina,
 // a partir de identificar la misma a partir de la key indicada
@@ -133,7 +144,9 @@ func (lista *ListaDeRutinas) ModificarRutina(nombre string, nuevosEjerciciosTota
 	if _, existe := lista.listaDeRutinas[nombre]; !existe {
 		return errors.New("la rutina no existe")
 	}
-		lista.AgregarRutina(nombre, nuevosEjerciciosTotales)
+	// Normalizar el nombre
+	nombreNormalizado := NormalizeString(nombre)
+		lista.AgregarRutina(nombreNormalizado, nuevosEjerciciosTotales)
 		return nil
 	}
 
@@ -166,7 +179,9 @@ func (lista *ListaDeRutinas) AgregarEjercicioARutina(nombre string, ejercicio *E
 	// Agregar el ejercicio al slice de ejerciciosTotales de la Rutina
 	rutina.EjerciciosTotales = append(rutina.EjerciciosTotales, ejercicio)
 	// Actualizar la rutina en el map de ListaDeRutinas
-	lista.AgregarRutina(nombre, rutina.EjerciciosTotales)
+		// Normalizar el nombre
+		nombreNormalizado := NormalizeString(nombre)
+	lista.AgregarRutina(nombreNormalizado, rutina.EjerciciosTotales)
 	return nil
 }
 
@@ -260,8 +275,8 @@ func downHeap(ejercicios []*Ejercicio, start, end int) {
 
 // Generación Automágica de Rutinas 1
 func (lista *ListaDeRutinas) GeneracionAutomagica(nombre string, duracionTotal int, tipo TipoEjercicio, dificultad Dificultad, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
-	// Filtrar los ejercicios que cumplan con los criterios especificados. Filtrar filtra por tipo, dificultad y mincalorias
-	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(tipo, dificultad, 0)
+	// Filtrar los ejercicios que cumplan con los criterios especificados
+	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(NormalizeTipoEjercicio(tipo), dificultad, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -279,16 +294,18 @@ func (lista *ListaDeRutinas) GeneracionAutomagica(nombre string, duracionTotal i
 		}
 	}
 
-	// Agregar la rutina a la lista de rutinas
-	lista.AgregarRutina(nombre,rutinaEjerciciosOrdenados)
-	rutina,err:= lista.ConsultarRutina(nombre)
+	// Normalizar el nombre de la rutina antes de agregarla
+	nombreNormalizado := NormalizeString(nombre)
 
+	// Agregar la rutina a la lista de rutinas
+	lista.AgregarRutina(nombreNormalizado, rutinaEjerciciosOrdenados)
+
+	// Consultar la rutina agregada para devolverla
+	rutina, err := lista.ConsultarRutina(nombreNormalizado)
 	return rutina, err
 }
 
 // Generación Automágica de Rutinas 2
-
-
 func (lista *ListaDeRutinas) GeneracionAutomagica2(nombre string, caloriasObjetivo int, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
 	// Obtener todos los ejercicios
 	ejerciciosDisponibles, err := listaEjercicios.ListarEjercicios()
@@ -325,17 +342,21 @@ func (lista *ListaDeRutinas) GeneracionAutomagica2(nombre string, caloriasObjeti
 	if caloriasAcumuladas < caloriasObjetivo {
 		return nil, errors.New("no es posible alcanzar las calorías objetivo con los ejercicios disponibles")
 	}
-
-	lista.AgregarRutina(nombre,rutinaEjercicios)
+	
+	nombreNormalizado := NormalizeString(nombre)
+	lista.AgregarRutina(nombreNormalizado,rutinaEjercicios)
 	rutina,_:= lista.ConsultarRutina(nombre)
-
 	return rutina, nil
 }
 
 // Versión 2 de Automagicas3
 func (lista *ListaDeRutinas) GeneracionAutomagica3v2(nombre string, duracionTotal int, tipo TipoEjercicio, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
-	// Filtrar los ejercicios por tipo
-	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(tipo, "", 0)
+	// Normalizar los campos
+	nombreNormalizado := NormalizeString(nombre)
+	tipoNormalizado := NormalizeTipoEjercicio(tipo)
+
+	// Filtrar los ejercicios por tipo y que tengan una duración menor o igual a la duración total
+	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(tipoNormalizado, "", duracionTotal)
 	if err != nil {
 		return nil, err
 	}
@@ -347,12 +368,12 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3v2(nombre string, duracionTota
 		dp[i] = make([]int, duracionTotal+1)
 	}
 
-	// Llenar la tabla de forma dinámica
+	// Llenar la tabla de forma dinámica para maximizar los puntos
 	for i := 1; i <= n; i++ {
 		ejercicio := ejerciciosFiltrados[i-1]
 		puntos := 0
 		for j, t := range ejercicio.TipoDeEjercicio {
-			if t == tipo {
+			if t == tipoNormalizado {
 				puntos = ejercicio.PuntosPorTipoDeEjercicio[j]
 				break
 			}
@@ -366,7 +387,7 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3v2(nombre string, duracionTota
 		}
 	}
 
-	// Recuperar los ejercicios seleccionados
+	// Recuperar los ejercicios seleccionados que maximizan los puntos dentro de la duración máxima
 	tiempoRestante := duracionTotal
 	rutinaEjercicios := []*Ejercicio{}
 	for i := n; i > 0 && tiempoRestante > 0; i-- {
@@ -379,9 +400,13 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3v2(nombre string, duracionTota
 
 	// Validar que se pudieron seleccionar ejercicios
 	if len(rutinaEjercicios) == 0 {
-		return nil, errors.New("no se pudieron seleccionar ejercicios")
+		return nil, errors.New("no se pudieron seleccionar ejercicios que cumplan con los criterios")
 	}
-	lista.AgregarRutina(nombre,rutinaEjercicios)
-	rutina,err:= lista.ConsultarRutina(nombre)
-	return rutina, err
+
+	// Normalizar el nombre antes de agregar la rutina a la lista
+	lista.AgregarRutina(nombreNormalizado, rutinaEjercicios)
+
+	// Consultar la rutina agregada para devolverla
+	rutina,_ := lista.ConsultarRutina(nombreNormalizado)
+	return rutina, nil
 }

@@ -188,6 +188,7 @@ func EliminarEjercicioDeRutinaMenu(lista *ListaDeRutinas, listaEjercicios *Lista
 		}
 }
 
+// Función GeneracionAutomagicaMenu actualizada
 func GeneracionAutomagicaMenu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -207,40 +208,14 @@ func GeneracionAutomagicaMenu(lista *ListaDeRutinas, listaEjercicios *ListaDeEje
 	fmt.Print("Tipo de ejercicios a incluir (por ejemplo, cardio, fuerza, balance, etc.): ")
 	tipoStr, _ := reader.ReadString('\n')
 	tipoStr = strings.TrimSpace(tipoStr)
-
-	var tipo TipoEjercicio
-	switch tipoStr {
-	case "cardio":
-		tipo = Cardio
-	case "fuerza":
-		tipo = Fuerza
-	case "balance":
-		tipo = Balance
-	default:
-		fmt.Println("Tipo de ejercicio inválido.")
-		return
-	}
+	tipo := TipoEjercicio(tipoStr)
 
 	fmt.Print("Nivel de dificultad de los ejercicios a incluir (por ejemplo, principiante, intermedio, avanzado): ")
 	dificultadStr, _ := reader.ReadString('\n')
 	dificultadStr = strings.TrimSpace(dificultadStr)
+	dificultad := NormalizeDificultad(dificultadStr)
 
-	var dificultad Dificultad
-	switch dificultadStr {
-	case "":
-		dificultad = ""
-	case string(Principiante):
-		dificultad = Principiante
-	case string(Intermedio):
-		dificultad = Intermedio
-	case string(Avanzado):
-		dificultad = Avanzado
-	default:
-		fmt.Println("Dificultad inválida.")
-		return
-	}
-
-	rutina, err := lista.GeneracionAutomagica(nombre, duracion, tipo, dificultad, listaEjercicios)
+	rutina, err := lista.GeneracionAutomagica(NormalizeString(nombre), duracion, NormalizeTipoEjercicio(tipo), dificultad, listaEjercicios)
 	if err != nil {
 		fmt.Println("Error al generar la rutina:", err)
 		return
@@ -258,7 +233,7 @@ func GeneracionAutomagicaMenu(lista *ListaDeRutinas, listaEjercicios *ListaDeEje
 	}
 }
 
-func GeneracionAutomagica2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios){
+func GeneracionAutomagica2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios) {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Print("Nombre: ")
@@ -274,8 +249,8 @@ func GeneracionAutomagica2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEj
 		return
 	}
 
-	// Generar la rutina automágicamente
-	rutina, err := lista.GeneracionAutomagica2(nombre, calorias, listaEjercicios)
+	// Generar la rutina automáticamente
+	rutina, err := lista.GeneracionAutomagica2(NormalizeString(nombre), calorias, listaEjercicios)
 	if err != nil {
 		fmt.Println("Error al generar la rutina:", err)
 		return
@@ -293,9 +268,8 @@ func GeneracionAutomagica2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEj
 	}
 }
 
-func GeneracionAutomagica3v2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios){
+func GeneracionAutomagica3v2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios) {
 	reader := bufio.NewReader(os.Stdin)
-	// Recibe nombre, duracion, tipo, y lista
 
 	fmt.Print("Nombre: ")
 	nombre, _ := reader.ReadString('\n')
@@ -315,21 +289,11 @@ func GeneracionAutomagica3v2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDe
 	tipoStr = strings.TrimSpace(tipoStr)
 
 	// Convertir el tipo de ejercicio a TipoEjercicio
-	var tipo TipoEjercicio
-	switch tipoStr {
-	case "cardio":
-		tipo = Cardio
-	case "fuerza":
-		tipo = Fuerza
-	case "balance":
-		tipo = Balance
-	default:
-		fmt.Println("Tipo de ejercicio inválido.")
-		return
-	}
+	tipoEjercicio := TipoEjercicio(tipoStr)
+	tipoNormalizado := NormalizeTipoEjercicio(tipoEjercicio)
 
 	// Generar la rutina automágicamente
-	rutina, err := lista.GeneracionAutomagica3v2(nombre, duracion, tipo, listaEjercicios)
+	rutina, err := lista.GeneracionAutomagica3v2(NormalizeString(nombre), duracion, tipoNormalizado, listaEjercicios)
 	if err != nil {
 		fmt.Println("Error al generar la rutina:", err)
 		return
@@ -356,7 +320,11 @@ func GuardarRutinas(lista *ListaDeRutinas) error {
 		}
 		return err
 	}
-
+	// Normalizar
+	for _, rutina := range rutinas {
+		rutina.Nombre = NormalizeString(rutina.Nombre)
+		rutina.Dificultad = Dificultad(NormalizeString(string(rutina.Dificultad)))
+	}
 	// Verificar si el archivo ya existe
 	existe, err := ArchivoExiste("rutinas.csv")
 	if err != nil {

@@ -2,6 +2,7 @@ package rutinaDeEjercicios
 
 import (
 	"errors"
+	"strings"
 )
 
 // Estructura de Ejercicio
@@ -67,6 +68,14 @@ func NewListaDeEjercicios() *ListaDeEjercicios {
 
 // AgregarEjercicio crea un ejercicio y lo agrega al map de listaDeEjercicios
 func (lista *ListaDeEjercicios) AgregarEjercicio(nombre string, descripcion string, tiempo int, calorias int, tipoDeEjercicio []TipoEjercicio, puntosPorTipoDeEjercicio []int, dificultad string) error {
+	// Normalizar campos
+	nombreNormalizado := NormalizeString(nombre)
+	descripcionNormalizada := NormalizeString(descripcion)
+	// Normalizar tipoDeEjercicio
+	tipoDeEjercicioNormalizado := make([]TipoEjercicio, len(tipoDeEjercicio))
+	for i, tipo := range tipoDeEjercicio {
+		tipoDeEjercicioNormalizado[i] = NormalizeTipoEjercicio(tipo)
+	}
 	// Validar la longitud de los slices tipoDeEjercicio y puntosPorTipoDeEjercicio
 	if len(tipoDeEjercicio) != len(puntosPorTipoDeEjercicio) {
 		return errors.New("los slices de tipoDeEjercicio y puntosPorTipoDeEjercicio deben tener la misma longitud")
@@ -75,23 +84,28 @@ func (lista *ListaDeEjercicios) AgregarEjercicio(nombre string, descripcion stri
 	if err := validarTipoDeEjercicio(tipoDeEjercicio); err != nil {
 		return err
 	}
-	// Validar la dificultad
-	dificultadValida := Dificultad(dificultad)
+	// Normalizar y validar la dificultad
+	dificultadValida := Dificultad(NormalizeString(dificultad))
 	if err := validarDificultad(dificultadValida); err != nil {
 		return err
 	}
 
 	ejercicio := &Ejercicio{
-		Nombre:                  nombre,
-		Descripcion:             descripcion,
+		Nombre:                  nombreNormalizado,
+		Descripcion:             descripcionNormalizada,
 		Tiempo:                  tiempo,
 		Calorias:                calorias,
-		TipoDeEjercicio:         tipoDeEjercicio,
+		TipoDeEjercicio:         tipoDeEjercicioNormalizado,
 		PuntosPorTipoDeEjercicio: puntosPorTipoDeEjercicio,
 		Dificultad:              dificultadValida,
 	}
 	lista.listaDeEjercicios[nombre] = ejercicio
 	return nil
+}
+
+// Función auxiliar para normalizar TipoEjercicio
+func NormalizeTipoEjercicio(tipo TipoEjercicio) TipoEjercicio {
+	return TipoEjercicio(NormalizeString(string(tipo)))
 }
 
 // BorrarEjercicio elimina el par key value, a partir de la key indicada
@@ -100,35 +114,47 @@ func (lista *ListaDeEjercicios) BorrarEjercicio(nombre string) error {
 	if _, existe := lista.listaDeEjercicios[nombre]; !existe {
 		return errors.New("el ejercicio no existe")
 	}
-	delete(lista.listaDeEjercicios, nombre)
+	// Normalizar el nombre de búsqueda
+	nombreNormalizado := NormalizeString(nombre)
+	delete(lista.listaDeEjercicios, nombreNormalizado)
 	return nil
 }
 
 // ConsultarEjercicioPorNombre busca el ejercicio a partir del nombre indicado y devuelve el Ejercicio
 func (lista *ListaDeEjercicios) ConsultarEjercicioPorNombre(nombre string) (*Ejercicio, error) {
-	// Validar que el ejercicio exista
-	ejercicio, existe := lista.listaDeEjercicios[nombre]
-	if !existe {
-		return nil, errors.New("el ejercicio no existe")
+	// Normalizar el nombre de búsqueda
+	nombreNormalizado := NormalizeString(nombre)
+
+	// Iterar sobre los ejercicios y buscar coincidencia parcial
+	for _, ejercicio := range lista.listaDeEjercicios {
+		nombreEjercicioNormalizado := NormalizeString(ejercicio.Nombre)
+		if strings.Contains(nombreEjercicioNormalizado, nombreNormalizado) {
+			return ejercicio, nil
+		}
 	}
-	return ejercicio, nil
+
+	return nil, errors.New("el ejercicio no existe")
 }
 
 // FiltrarEjercicios permite filtrar los ejercicios que cumplan con los criterios indicados por parámetro
 // y devuleve un slice con los ejercicios que cumplan
+// Función FiltrarEjercicios actualizada para normalizar Dificultad
 func (lista *ListaDeEjercicios) FiltrarEjercicios(tipo TipoEjercicio, dificultad Dificultad, minCalorias int) ([]*Ejercicio, error) {
 	ejerciciosFiltrados := make([]*Ejercicio, 0)
+	tipoNormalizado := NormalizeString(string(tipo))
+	dificultadNormalizada := NormalizeString(string(dificultad))
 	// Recorrer todos los ejercicios
 	for _, ejercicio := range lista.listaDeEjercicios {
 		// Se crea un booleano para ver si el ejercicio cumple los filtros o no
 		// se inicializa en true y luego las comprobaciones van pasando a false los que no cumplan
 		cumpleFiltro := true
 		// Se verifica el tipo de ejercicio, si es que se pasa por parámetro
-		if tipo != "" {
+		if tipoNormalizado != "" {
 			tipoEncontrado := false
 			for _, t := range ejercicio.TipoDeEjercicio {
-				if t == tipo {
+				if NormalizeString(string(t)) == tipoNormalizado {
 					tipoEncontrado = true
+					break
 				}
 			}
 			if !tipoEncontrado {
@@ -136,7 +162,7 @@ func (lista *ListaDeEjercicios) FiltrarEjercicios(tipo TipoEjercicio, dificultad
 			}
 		}
 		// Se verifica la dificultad, si es que se pasa por parámetro
-		if dificultad != "" && ejercicio.Dificultad != Dificultad(dificultad) {
+		if dificultadNormalizada != "" && NormalizeString(string(ejercicio.Dificultad)) != dificultadNormalizada {
 			cumpleFiltro = false
 		}
 		// Se verifican las calorías mínimas, si es que se pasa por parámetro
@@ -162,23 +188,33 @@ func (lista *ListaDeEjercicios) ModificarEjercicio(nombre string, nuevaDescripci
 	if len(nuevoTipoDeEjercicio) != len(nuevosPuntosPorTipoDeEjercicio) {
 		return errors.New("los slices de tipoDeEjercicio y puntosPorTipoDeEjercicio deben tener la misma longitud")
 	}
+
+	// Normalizar los campos
+	nombreNormalizado := NormalizeString(nombre)
+	nuevaDescripcionNormalizada := NormalizeString(nuevaDescripcion)
+	nuevaDificultadNormalizada := NormalizeString(nuevaDificultad)
+	// Normalizar el slice nuevoTipoDeEjercicio
+	nuevoTipoDeEjercicioNormalizado := make([]TipoEjercicio, 0, len(nuevoTipoDeEjercicio))
+	for _, tipo := range nuevoTipoDeEjercicio {
+		nuevoTipoDeEjercicioNormalizado = append(nuevoTipoDeEjercicioNormalizado, TipoEjercicio(NormalizeString(string(tipo))))
+	}
 	// Validar los tipos de ejercicio
-	if err := validarTipoDeEjercicio(nuevoTipoDeEjercicio); err != nil {
+	if err := validarTipoDeEjercicio(nuevoTipoDeEjercicioNormalizado); err != nil {
 		return err
 	}
 	// Validar la dificultad
-	nuevaDificultadValida := Dificultad(nuevaDificultad)
+	nuevaDificultadValida := Dificultad(nuevaDificultadNormalizada)
 	if err := validarDificultad(nuevaDificultadValida); err != nil {
 		return err
 	}
 	// Validar que el ejercicio exista
-	_, existe := lista.listaDeEjercicios[nombre]
+	_, existe := lista.listaDeEjercicios[nombreNormalizado]
 	if !existe {
 		return errors.New("el ejercicio no existe")
 	}
 
 	// Llamamos a AgregarEjercicio para actualizar los valores del ejercicio existente
-	err := lista.AgregarEjercicio(nombre, nuevaDescripcion, nuevoTiempo, nuevasCalorias, nuevoTipoDeEjercicio, nuevosPuntosPorTipoDeEjercicio, string(nuevaDificultadValida))
+	err := lista.AgregarEjercicio(nombreNormalizado, nuevaDescripcionNormalizada, nuevoTiempo, nuevasCalorias, nuevoTipoDeEjercicioNormalizado, nuevosPuntosPorTipoDeEjercicio, string(nuevaDificultadValida))
 	if err != nil {
 		return err
 	}

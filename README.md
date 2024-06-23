@@ -18,4 +18,8 @@ Se presenta un main que al ejecutarse abre un menú para interactuar desde la co
 
 ###
 
+Para las funciones Automágicas se usan enfoques vistos en clase como Greedy y programación dinámica.
+
+###
+
 Tosos los ejercicios y rutinas creados/borrados se almacenan en rutinas.csv y ejercicios.csv usando gocarina
