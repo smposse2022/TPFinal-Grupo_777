@@ -89,12 +89,12 @@ func TestFiltrarEjercicios(t *testing.T) {
 	lista := NewListaDeEjercicios()
 	// Agregar ejercicios para filtrar
 	lista.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "intermedio")
-	lista.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
+	lista.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza","balance"}, []int{50,20}, "principiante")
 	lista.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 12, 200, []TipoEjercicio{"balance"}, []int{70}, "avanzado")
 
 
 	ejerciciosFiltrados, _ := lista.FiltrarEjercicios("balance", "", 0)
-	assert.Equal(t, "estocadas", ejerciciosFiltrados[0].Nombre, "Los ejercicios deberían ser iguales")
+	assert.Equal(t, 2, len(ejerciciosFiltrados), "Los ejercicios deberían ser iguales")
 	// Caso de prueba donde se filtra por mínimo de calorías
 	ejerciciosFiltrados, _ = lista.FiltrarEjercicios("", "", 100) // Debería traer un slice con 2 ejercicios
 	assert.Equal(t, 2, len(ejerciciosFiltrados))

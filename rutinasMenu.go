@@ -232,7 +232,7 @@ func GeneracionAutomagicaMenu(lista *ListaDeRutinas, listaEjercicios *ListaDeEje
 		fmt.Println("Error al guardar la rutina:", err)
 	}
 }
-
+/*
 func GeneracionAutomagica2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -310,7 +310,7 @@ func GeneracionAutomagica3v2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDe
 		}
 	}
 }
-	
+	*/
 func GuardarRutinas(lista *ListaDeRutinas) error {
 	rutinas, err := lista.ListarRutinas()
 	if err != nil {

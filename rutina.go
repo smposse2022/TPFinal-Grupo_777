@@ -218,93 +218,87 @@ func (lista *ListaDeRutinas) EliminaEjercicioDeRutina(nombre string, ejercicio *
 	return nil
 }
 
-// Heapsort para ordenamiento por duración
-func HeapSort(ejercicios []*Ejercicio) []*Ejercicio {
-	size := len(ejercicios)
-	heapify(ejercicios) // Construye un heap máximo a partir del arreglo
+// QuickSort
+func QuickSort(ejercicios []*Ejercicio, low, high int) {
+    if low < high {
+        pi := partition(ejercicios, low, high)
 
-	// En cada iteración, se extrae el elemento máximo del heap y se coloca al final del arreglo.
-	// Luego, se ajusta el heap hacia abajo para mantener la propiedad del heap.
-	end := size - 1
-	for end > 0 {
-		// Intercambia el máximo actual con el último elemento del arreglo
-		ejercicios[end], ejercicios[0] = ejercicios[0], ejercicios[end]
-		// Ajusta el heap hacia abajo (restaura la propiedad del heap)
-		downHeap(ejercicios, 0, end-1)
-		// Reduce el tamaño efectivo del arreglo en 1 para excluir el elemento ya ordenado
-		end--
-	}
-	return ejercicios
+        QuickSort(ejercicios, low, pi-1)
+        QuickSort(ejercicios, pi+1, high)
+    }
 }
 
-func heapify(ejercicios []*Ejercicio) {
-	size := len(ejercicios)
-	// El primer nodo que tiene hijos se encuentra en la posición (size - 2) / 2.
-	start := (size - 2) / 2
+// Función auxiliar para particionar el slice de ejercicios
+func partition(ejercicios []*Ejercicio, low, high int) int {
+    pivot := ejercicios[high].Tiempo
+    i := low - 1
 
-	// Comienza desde el último padre y ajusta cada subárbol hacia abajo para cumplir la propiedad del heap.
-	for start >= 0 {
-		downHeap(ejercicios, start, size-1)
-		start--
-	}
+    for j := low; j < high; j++ {
+        if ejercicios[j].Tiempo < pivot {
+            i++
+            ejercicios[i], ejercicios[j] = ejercicios[j], ejercicios[i]
+        }
+    }
+
+    ejercicios[i+1], ejercicios[high] = ejercicios[high], ejercicios[i+1]
+    return i+1
 }
 
-func downHeap(ejercicios []*Ejercicio, start, end int) {
-	father := start
-	leftSon := father*2 + 1
-	rightSon := leftSon + 1
-
-	// Mientras el padre tenga al menos un hijo
-	for leftSon <= end {
-		// Si el padre tiene dos hijos, nos quedamos con el menor
-		if rightSon <= end && ejercicios[rightSon].Tiempo < ejercicios[leftSon].Tiempo {
-			leftSon = rightSon
-		}
-		// Si el hijo es menor que el padre, los intercambiamos
-		if ejercicios[leftSon].Tiempo < ejercicios[father].Tiempo {
-			ejercicios[leftSon], ejercicios[father] = ejercicios[father], ejercicios[leftSon]
-			// El hijo se convierte en el padre
-			father = leftSon
-			leftSon = father*2 + 1
-			rightSon = leftSon + 1
-		} else {
-			return
-		}
-	}
-}
-
-// Generación Automágica de Rutinas 1
 func (lista *ListaDeRutinas) GeneracionAutomagica(nombre string, duracionTotal int, tipo TipoEjercicio, dificultad Dificultad, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
+	// Asegurar que lista no sea nil
+	if lista == nil {
+		return nil, errors.New("lista de rutinas no puede ser nil")
+	}
+
+	// Asegurar que listaEjercicios no sea nil
+	if listaEjercicios == nil {
+		return nil, errors.New("lista de ejercicios no puede ser nil")
+	}
+
 	// Filtrar los ejercicios que cumplan con los criterios especificados
 	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(NormalizeTipoEjercicio(tipo), dificultad, 0)
 	if err != nil {
 		return nil, err
 	}
-	// Ordenar los ejercicios filtrados por duración ascendente usando HeapSort
-	ejerciciosOrdenados := HeapSort(ejerciciosFiltrados)
 
-	var rutinaEjerciciosOrdenados []*Ejercicio
+	// Ordenar los ejercicios por tiempo ascendente usando Quicksort
+	QuickSort(ejerciciosFiltrados, 0, len(ejerciciosFiltrados)-1)
+
+	// Seleccionar ejercicios hasta completar la duración total
+	ejerciciosSeleccionados := make([]*Ejercicio, 0)
 	tiempoAcumulado := 0
-
-	// Seleccionar los ejercicios de manera greedy
-	for _, ejercicio := range ejerciciosOrdenados {
-		if tiempoAcumulado+ejercicio.Tiempo <= duracionTotal {
-			rutinaEjerciciosOrdenados = append(rutinaEjerciciosOrdenados, ejercicio)
-			tiempoAcumulado += ejercicio.Tiempo
+	for i := 0; i < len(ejerciciosFiltrados); i++ {
+		if tiempoAcumulado+ejerciciosFiltrados[i].Tiempo <= duracionTotal {
+			ejerciciosSeleccionados = append(ejerciciosSeleccionados, ejerciciosFiltrados[i])
+			tiempoAcumulado += ejerciciosFiltrados[i].Tiempo
+		} else {
+			break
 		}
+	}
+
+	// Verificar si se alcanzó la duración total deseada
+	if tiempoAcumulado < duracionTotal {
+		return nil, errors.New("no se puede alcanzar el tiempo deseado con los ejercicios existentes")
 	}
 
 	// Normalizar el nombre de la rutina antes de agregarla
 	nombreNormalizado := NormalizeString(nombre)
 
 	// Agregar la rutina a la lista de rutinas
-	lista.AgregarRutina(nombreNormalizado, rutinaEjerciciosOrdenados)
+	err = lista.AgregarRutina(nombreNormalizado, ejerciciosSeleccionados)
+	if err != nil {
+		return nil, err
+	}
 
-	// Consultar la rutina agregada para devolverla
+	// Consultar y devolver la rutina recién agregada
 	rutina, err := lista.ConsultarRutina(nombreNormalizado)
-	return rutina, err
-}
+	if err != nil {
+		return nil, err
+	}
 
+	return rutina, nil
+}
+/*
 // Generación Automágica de Rutinas 2
 func (lista *ListaDeRutinas) GeneracionAutomagica2(nombre string, caloriasObjetivo int, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
 	// Obtener todos los ejercicios
@@ -409,4 +403,4 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3v2(nombre string, duracionTota
 	// Consultar la rutina agregada para devolverla
 	rutina,_ := lista.ConsultarRutina(nombreNormalizado)
 	return rutina, nil
-}
+}*/

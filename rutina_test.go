@@ -201,47 +201,81 @@ func TestGeneracionAutomagica_Exito(t *testing.T) {
 	lista := NewListaDeRutinas()
 	listaEjercicios := NewListaDeEjercicios()
 
-	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("flexiones de brazos", "descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("sentadillas", "descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("estocadas", "descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	// Agregar ejercicios
+	listaEjercicios.AgregarEjercicio("ejercicio1", "descripcion de ejercicio 1", 12, 40, []TipoEjercicio{"fuerza", "balance"}, []int{50,60}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio2", "descripcion de ejercicio 2", 7, 100, []TipoEjercicio{"fuerza","balance"}, []int{24,20}, "intermedio")
+	listaEjercicios.AgregarEjercicio("ejercicio3", "descripcion de ejercicio 3", 12, 300, []TipoEjercicio{"balance","cardio"}, []int{19,12}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio4", "descripcion de ejercicio 4", 40, 40, []TipoEjercicio{"fuerza"}, []int{16}, "avanzado")
+	listaEjercicios.AgregarEjercicio("ejercicio5", "descripcion de ejercicio 5", 350, 100, []TipoEjercicio{"fuerza"}, []int{17}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio6", "descripcion de ejercicio 6", 20, 300, []TipoEjercicio{"fuerza"}, []int{14}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio7", "descripcion de ejercicio 7", 14, 40, []TipoEjercicio{"fuerza"}, []int{55}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio8", "descripcion de ejercicio 8", 7, 100, []TipoEjercicio{"balance"}, []int{63}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio9", "descripcion de ejercicio 9", 8, 300, []TipoEjercicio{"balance","fuerza"}, []int{59,44}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio10", "descripcion de ejercicio 10", 35, 40, []TipoEjercicio{"cardio","balance"}, []int{58,42}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio11", "descripcion de ejercicio 11", 60, 100, []TipoEjercicio{"fuerza","cardio"}, []int{50,20}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio12", "descripcion de ejercicio 12", 53, 300, []TipoEjercicio{"cardio"}, []int{50}, "avanzado")
+
 
 	// Llamar a la función GeneracionAutomagica
-	rutina, _ := lista.GeneracionAutomagica("rutinaAutomagica1", 30, "fuerza", "principiante", listaEjercicios)
-	// Verificar que la duración de la rutina sea correcta: 20+10 y que tenga 2 ejercicios:Flexiones de brazos y Sentadillas
-	assert.Equal(t, 30, rutina.Duracion, "la duración no es igual a la duración total de los ejercicios disponibles")
-	assert.Equal(t, "flexiones de brazos", rutina.EjerciciosTotales[0].Nombre)
-	assert.Equal(t, "sentadillas", rutina.EjerciciosTotales[1].Nombre)
-}
+	rutina,_:=lista.GeneracionAutomagica("rutinaAutomagica1", 60, "fuerza", "principiante", listaEjercicios)
+	// Verificar que la duración de la rutina sea correcta, que es 54, no llega a 60 con los ejercicios disponibles. Y si pone el siguiente ejercicio de menor tiempo se pasa, por eso no lo agrega
+	assert.Equal(t, 54, rutina.Duracion, "la duración no es igual a la duración total de los ejercicios disponibles")
+	assert.Equal(t, 4, len(rutina.EjerciciosTotales)) // debería haber 4 ejercicios, ejercicio 9, ejercicio 1, ejercicio 7, ejercicio 6, ejercicio 11, ejercicio 5
+	assert.Equal(t, "ejercicio9", rutina.EjerciciosTotales[0].Nombre) // El 1er ejercicio que se agrega es el ejercicio9 al ser el más corto
+	assert.Equal(t, "ejercicio1", rutina.EjerciciosTotales[1].Nombre) // El 2do ejercicio que se agrega es el ejercicio1 al ser el segundo más corto
+	assert.Equal(t, "ejercicio7", rutina.EjerciciosTotales[2].Nombre) // El 3ro ejercicio que se agrega es el ejercicio7 al ser el tercero más corto
+	}
 
 func TestGeneracionAutomagica_Error_TipoEjercicioInexistente(t *testing.T) {
 	lista := NewListaDeRutinas()
 	listaEjercicios := NewListaDeEjercicios()
 
-	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	// Agregar ejercicios
+	listaEjercicios.AgregarEjercicio("ejercicio1", "descripcion de ejercicio 1", 12, 40, []TipoEjercicio{"fuerza", "balance"}, []int{50,60}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio2", "descripcion de ejercicio 2", 7, 100, []TipoEjercicio{"fuerza","balance"}, []int{24,20}, "intermedio")
+	listaEjercicios.AgregarEjercicio("ejercicio3", "descripcion de ejercicio 3", 12, 300, []TipoEjercicio{"balance"}, []int{19}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio4", "descripcion de ejercicio 4", 40, 40, []TipoEjercicio{"fuerza"}, []int{16}, "avanzado")
+	listaEjercicios.AgregarEjercicio("ejercicio5", "descripcion de ejercicio 5", 350, 100, []TipoEjercicio{"fuerza"}, []int{17}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio6", "descripcion de ejercicio 6", 20, 300, []TipoEjercicio{"fuerza"}, []int{14}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio7", "descripcion de ejercicio 7", 14, 40, []TipoEjercicio{"fuerza"}, []int{55}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio8", "descripcion de ejercicio 8", 7, 100, []TipoEjercicio{"balance"}, []int{63}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio9", "descripcion de ejercicio 9", 8, 300, []TipoEjercicio{"balance","fuerza"}, []int{59,44}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio10", "descripcion de ejercicio 10", 35, 40, []TipoEjercicio{"balance"}, []int{42}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio11", "descripcion de ejercicio 11", 60, 100, []TipoEjercicio{"fuerza"}, []int{20}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio12", "descripcion de ejercicio 12", 53, 300, []TipoEjercicio{"balance"}, []int{50}, "avanzado")
+
 
 	// Llamar a la función GeneracionAutomagica
-	_, err := lista.GeneracionAutomagica("RutinaAutomagica1", 30, "cardio", "principiante", listaEjercicios)
-	assert.Error(t, err, "Se esperaba un error debido al tipo de ejercicio inexistente, pero no se recibió ningún error.")
+	_, err := lista.GeneracionAutomagica("rutinaAutomagica1", 60, "cardio", "principiante", listaEjercicios)
+	// Debería dar error por tipo inexistente
+	assert.Error(t, err, "Se esperaba un error debido a que se solicita un tipo inexistente entre los ejercicios disponibles (cardio)")
 }
 
 func TestGeneracionAutomagica_Error_DuracionNoAlcanzada(t *testing.T) {
 	lista := NewListaDeRutinas()
 	listaEjercicios := NewListaDeEjercicios()
 
-	// Agregar 3 ejercicios
-	listaEjercicios.AgregarEjercicio("Flexiones de brazos", "Descripcion de flexiones de brazos", 20, 40, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Sentadillas", "Descripcion de sentadillas", 10, 100, []TipoEjercicio{"fuerza"}, []int{50}, "principiante")
-	listaEjercicios.AgregarEjercicio("Estocadas", "Descripcion de estocadas", 30, 300, []TipoEjercicio{"balance"}, []int{50}, "principiante")
+	// Agregar ejercicios
+	listaEjercicios.AgregarEjercicio("ejercicio1", "descripcion de ejercicio 1", 12, 40, []TipoEjercicio{"fuerza", "balance"}, []int{50,60}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio2", "descripcion de ejercicio 2", 7, 100, []TipoEjercicio{"fuerza","balance"}, []int{24,20}, "intermedio")
+	listaEjercicios.AgregarEjercicio("ejercicio3", "descripcion de ejercicio 3", 12, 300, []TipoEjercicio{"balance","cardio"}, []int{19,12}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio4", "descripcion de ejercicio 4", 40, 40, []TipoEjercicio{"fuerza"}, []int{16}, "avanzado")
+	listaEjercicios.AgregarEjercicio("ejercicio5", "descripcion de ejercicio 5", 350, 100, []TipoEjercicio{"fuerza"}, []int{17}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio6", "descripcion de ejercicio 6", 20, 300, []TipoEjercicio{"fuerza"}, []int{14}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio7", "descripcion de ejercicio 7", 14, 40, []TipoEjercicio{"fuerza"}, []int{55}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio8", "descripcion de ejercicio 8", 7, 100, []TipoEjercicio{"balance"}, []int{63}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio9", "descripcion de ejercicio 9", 8, 300, []TipoEjercicio{"balance","fuerza"}, []int{59,44}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio10", "descripcion de ejercicio 10", 35, 40, []TipoEjercicio{"cardio","balance"}, []int{58,42}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio11", "descripcion de ejercicio 11", 60, 100, []TipoEjercicio{"fuerza","cardio"}, []int{50,20}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio12", "descripcion de ejercicio 12", 53, 300, []TipoEjercicio{"cardio"}, []int{50}, "avanzado")
+
 
 	// Llamar a la función GeneracionAutomagica
-	_, err := lista.GeneracionAutomagica("RutinaAutomagica1", 70, "cardio", "principiante", listaEjercicios)
-	assert.Error(t, err, "Se esperaba un error debido a que no se alcanza el tiempo deseado")
+	_,err := lista.GeneracionAutomagica("rutinaAutomagica1", 700, "fuerza", "principiante", listaEjercicios)
+	// Debería dar error por no alcanzar el tiempo deseado
+	assert.Error(t, err, "debería dar error al no alcanzar el tiempo deseado")
 }
-
+/*
 // Test Generación Automágica2 de Rutinas
 func TestGeneracionAutomagica2_Exito(t *testing.T) {
 	lista := NewListaDeRutinas()
@@ -291,4 +325,4 @@ func TestGeneracionAutomagica3v2(t *testing.T) {
 	lista.GeneracionAutomagica3v2("RutinaAutomagica3", 40, "fuerza",listaEjercicios)
 	rutina,_ := lista.ConsultarRutina("RutinaAutomagica3")
 	assert.Equal(t, 2, len(rutina.EjerciciosTotales), "Debería tener 2 ejercicios, Flexiones de brazos y Sentadillas")
-}
+}*/
