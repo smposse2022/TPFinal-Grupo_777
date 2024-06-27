@@ -389,3 +389,76 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3(nombre string, duracionTotal 
 
 	return rutina, nil
 }
+
+// Automágicas 3v2
+func (lista *ListaDeRutinas) GeneracionAutomagica3v2(nombre string, duracionTotal int, tipo TipoEjercicio, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
+	tipoNormalizado := NormalizeTipoEjercicio(tipo)
+
+	// Filtrar los ejercicios por tipo
+	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(tipoNormalizado, "", 0)
+	if err != nil {
+		return nil, err
+	}
+
+	// Para ver el valor de puntos en ese tipo específico de ejercicio
+	for _, ejercicio := range ejerciciosFiltrados {
+		for j, tipoEj := range ejercicio.TipoDeEjercicio {
+			if tipoEj == tipo {
+				ejercicio.PuntosPorTipoDeEjercicio = []int{ejercicio.PuntosPorTipoDeEjercicio[j]}
+				ejercicio.TipoDeEjercicio = []TipoEjercicio{tipo}
+			}
+		}
+	}
+
+	// Ordenar los ejercicios por puntos de mayor a menor
+	QuickSortPuntos(ejerciciosFiltrados, 0, len(ejerciciosFiltrados)-1)
+
+	// Programación dinámica para seleccionar los ejercicios
+	n := len(ejerciciosFiltrados)
+	dp := make([][]int, n+1)
+	for i := range dp {
+		dp[i] = make([]int, duracionTotal+1)
+	}
+
+	for i := 1; i <= n; i++ {
+		for w := 0; w <= duracionTotal; w++ {
+			if ejerciciosFiltrados[i-1].Tiempo <= w {
+				dp[i][w] = max(dp[i-1][w], dp[i-1][w-ejerciciosFiltrados[i-1].Tiempo]+ejerciciosFiltrados[i-1].PuntosPorTipoDeEjercicio[0])
+			} else {
+				dp[i][w] = dp[i-1][w]
+			}
+		}
+	}
+
+	// Recuperar los ejercicios seleccionados
+	ejerciciosSeleccionados := make([]*Ejercicio, 0)
+	tiempoAcumulado := duracionTotal
+	for i := n; i > 0 && tiempoAcumulado > 0; i-- {
+		if dp[i][tiempoAcumulado] != dp[i-1][tiempoAcumulado] {
+			ejerciciosSeleccionados = append(ejerciciosSeleccionados, ejerciciosFiltrados[i-1])
+			tiempoAcumulado -= ejerciciosFiltrados[i-1].Tiempo
+		}
+	}
+
+	// Normalizar el nombre de la rutina antes de agregarla
+	nombreNormalizado := NormalizeString(nombre)
+
+	// Agregar la rutina a la lista de rutinas
+	lista.AgregarRutina(nombreNormalizado, ejerciciosSeleccionados)
+
+	// Consultar y devolver la rutina recién agregada
+	rutina, err := lista.ConsultarRutina(nombreNormalizado)
+	if err != nil {
+		return nil, err
+	}
+
+	return rutina, nil
+}
+
+// Función auxiliar para obtener el máximo de dos enteros
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}

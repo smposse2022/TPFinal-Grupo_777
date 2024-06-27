@@ -326,3 +326,32 @@ func TestGeneracionAutomagica3_Exito(t *testing.T) {
 	assert.Equal(t, "ejercicio1", rutina.EjerciciosTotales[1].Nombre)
 	assert.Equal(t, "ejercicio11", rutina.EjerciciosTotales[2].Nombre)
 }
+
+func TestGeneracionAutomagica3v2_Exito(t *testing.T) {
+	lista := NewListaDeRutinas()
+	listaEjercicios := NewListaDeEjercicios()
+
+	// Agregar ejercicios
+	listaEjercicios.AgregarEjercicio("ejercicio1", "descripcion de ejercicio 1", 12, 40, []TipoEjercicio{"fuerza", "balance"}, []int{50,60}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio2", "descripcion de ejercicio 2", 7, 100, []TipoEjercicio{"fuerza","balance"}, []int{24,20}, "intermedio")
+	listaEjercicios.AgregarEjercicio("ejercicio3", "descripcion de ejercicio 3", 12, 300, []TipoEjercicio{"balance","cardio"}, []int{19,12}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio4", "descripcion de ejercicio 4", 40, 40, []TipoEjercicio{"fuerza"}, []int{16}, "avanzado")
+	listaEjercicios.AgregarEjercicio("ejercicio5", "descripcion de ejercicio 5", 35, 100, []TipoEjercicio{"fuerza"}, []int{17}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio6", "descripcion de ejercicio 6", 20, 300, []TipoEjercicio{"fuerza"}, []int{14}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio7", "descripcion de ejercicio 7", 14, 40, []TipoEjercicio{"fuerza"}, []int{55}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio8", "descripcion de ejercicio 8", 6, 100, []TipoEjercicio{"balance"}, []int{63}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio9", "descripcion de ejercicio 9", 8, 300, []TipoEjercicio{"balance","fuerza"}, []int{59,44}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio10", "descripcion de ejercicio 10", 35, 40, []TipoEjercicio{"cardio","balance"}, []int{58,42}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio11", "descripcion de ejercicio 11", 60, 100, []TipoEjercicio{"fuerza","cardio"}, []int{50,20}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio12", "descripcion de ejercicio 12", 53, 300, []TipoEjercicio{"cardio"}, []int{50}, "avanzado")
+
+
+	// Llamar a la función GeneracionAutomagica2
+	rutina,_ := lista.GeneracionAutomagica3v2("automagica2", 90, "fuerza", listaEjercicios)
+	assert.Equal(t, 5, len(rutina.EjerciciosTotales)) // Deberían ser 5 ejercicios
+	assert.Equal(t, "ejercicio5", rutina.EjerciciosTotales[0].Nombre)
+	assert.Equal(t, "ejercicio2", rutina.EjerciciosTotales[1].Nombre)
+	assert.Equal(t, "ejercicio9", rutina.EjerciciosTotales[2].Nombre)
+	assert.Equal(t, "ejercicio1", rutina.EjerciciosTotales[3].Nombre)
+	assert.Equal(t, "ejercicio7", rutina.EjerciciosTotales[4].Nombre)
+}
