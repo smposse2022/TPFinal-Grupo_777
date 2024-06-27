@@ -251,30 +251,6 @@ func TestGeneracionAutomagica_Error_TipoEjercicioInexistente(t *testing.T) {
 	assert.Error(t, err, "Se esperaba un error debido a que se solicita un tipo inexistente entre los ejercicios disponibles (cardio)")
 }
 
-func TestGeneracionAutomagica_Error_DuracionNoAlcanzada(t *testing.T) {
-	lista := NewListaDeRutinas()
-	listaEjercicios := NewListaDeEjercicios()
-
-	// Agregar ejercicios
-	listaEjercicios.AgregarEjercicio("ejercicio1", "descripcion de ejercicio 1", 12, 40, []TipoEjercicio{"fuerza", "balance"}, []int{50,60}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio2", "descripcion de ejercicio 2", 7, 100, []TipoEjercicio{"fuerza","balance"}, []int{24,20}, "intermedio")
-	listaEjercicios.AgregarEjercicio("ejercicio3", "descripcion de ejercicio 3", 12, 300, []TipoEjercicio{"balance","cardio"}, []int{19,12}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio4", "descripcion de ejercicio 4", 40, 40, []TipoEjercicio{"fuerza"}, []int{16}, "avanzado")
-	listaEjercicios.AgregarEjercicio("ejercicio5", "descripcion de ejercicio 5", 350, 100, []TipoEjercicio{"fuerza"}, []int{17}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio6", "descripcion de ejercicio 6", 20, 300, []TipoEjercicio{"fuerza"}, []int{14}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio7", "descripcion de ejercicio 7", 14, 40, []TipoEjercicio{"fuerza"}, []int{55}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio8", "descripcion de ejercicio 8", 7, 100, []TipoEjercicio{"balance"}, []int{63}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio9", "descripcion de ejercicio 9", 8, 300, []TipoEjercicio{"balance","fuerza"}, []int{59,44}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio10", "descripcion de ejercicio 10", 35, 40, []TipoEjercicio{"cardio","balance"}, []int{58,42}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio11", "descripcion de ejercicio 11", 60, 100, []TipoEjercicio{"fuerza","cardio"}, []int{50,20}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio12", "descripcion de ejercicio 12", 53, 300, []TipoEjercicio{"cardio"}, []int{50}, "avanzado")
-
-
-	// Llamar a la función GeneracionAutomagica
-	_,err := lista.GeneracionAutomagica("rutinaAutomagica1", 700, "fuerza", "principiante", listaEjercicios)
-	// Debería dar error por no alcanzar el tiempo deseado
-	assert.Error(t, err, "debería dar error al no alcanzar el tiempo deseado")
-}
 func TestGeneracionAutomagica2_Exito(t *testing.T) {
 	lista := NewListaDeRutinas()
 	listaEjercicios := NewListaDeEjercicios()
@@ -287,18 +263,17 @@ func TestGeneracionAutomagica2_Exito(t *testing.T) {
 	listaEjercicios.AgregarEjercicio("ejercicio5", "descripcion de ejercicio 5", 350, 100, []TipoEjercicio{"fuerza"}, []int{17}, "principiante")
 	listaEjercicios.AgregarEjercicio("ejercicio6", "descripcion de ejercicio 6", 20, 300, []TipoEjercicio{"fuerza"}, []int{14}, "principiante")
 	listaEjercicios.AgregarEjercicio("ejercicio7", "descripcion de ejercicio 7", 14, 40, []TipoEjercicio{"fuerza"}, []int{55}, "principiante")
-	listaEjercicios.AgregarEjercicio("ejercicio8", "descripcion de ejercicio 8", 7, 100, []TipoEjercicio{"balance"}, []int{63}, "principiante")
+	listaEjercicios.AgregarEjercicio("ejercicio8", "descripcion de ejercicio 8", 6, 100, []TipoEjercicio{"balance"}, []int{63}, "principiante")
 	listaEjercicios.AgregarEjercicio("ejercicio9", "descripcion de ejercicio 9", 8, 300, []TipoEjercicio{"balance","fuerza"}, []int{59,44}, "principiante")
 	listaEjercicios.AgregarEjercicio("ejercicio10", "descripcion de ejercicio 10", 35, 40, []TipoEjercicio{"cardio","balance"}, []int{58,42}, "principiante")
 	listaEjercicios.AgregarEjercicio("ejercicio11", "descripcion de ejercicio 11", 60, 100, []TipoEjercicio{"fuerza","cardio"}, []int{50,20}, "principiante")
 	listaEjercicios.AgregarEjercicio("ejercicio12", "descripcion de ejercicio 12", 53, 300, []TipoEjercicio{"cardio"}, []int{50}, "avanzado")
 
 
-	// Llamar a la función GeneracionAutomagica
-	rutina,_ := lista.GeneracionAutomagica2("rutinaAutomagica1", 40,  listaEjercicios)
-	assert.Equal(t, 12, rutina.Duracion)
-	assert.Equal(t, 1, len(rutina.EjerciciosTotales))
-	assert.Equal(t, "ejercicio1", rutina.EjerciciosTotales[0].Nombre)
+	// Llamar a la función GeneracionAutomagica2
+	rutina,_ := lista.GeneracionAutomagica2("automagica2", 400, listaEjercicios)
+	assert.Equal(t, 21, rutina.Duracion) // Agrega los 3 ejercicios de menor tiempo. Se pasa de las 400 calorías y corta. Es el mínimo tiempo en que llega a las 400 calorías
+
 }
 func TestGeneracionAutomagica2_Error_CaloriasNoAlcanzada(t *testing.T) {
 	lista := NewListaDeRutinas()

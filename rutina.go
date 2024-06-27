@@ -266,11 +266,6 @@ func (lista *ListaDeRutinas) GeneracionAutomagica(nombre string, duracionTotal i
 		}
 	}
 
-	// Verificar si se alcanzó la duración total deseada
-	if tiempoAcumulado < duracionTotal {
-		return nil, errors.New("no se puede alcanzar el tiempo deseado con los ejercicios existentes")
-	}
-
 	// Normalizar el nombre de la rutina antes de agregarla
 	nombreNormalizado := NormalizeString(nombre)
 
@@ -304,22 +299,21 @@ func (lista *ListaDeRutinas) GeneracionAutomagica2(nombre string, caloriasObjeti
 	ejerciciosSeleccionados := make([]*Ejercicio, 0)
 	caloriasAcumuladas := 0
 	for i := 0; i < len(ejerciciosFiltrados); i++ {
-		if caloriasAcumuladas+ejerciciosFiltrados[i].Calorias <= caloriasObjetivo {
-			ejerciciosSeleccionados = append(ejerciciosSeleccionados, ejerciciosFiltrados[i])
-			caloriasAcumuladas += ejerciciosFiltrados[i].Calorias
-		} else {
+		ejerciciosSeleccionados = append(ejerciciosSeleccionados, ejerciciosFiltrados[i])
+		caloriasAcumuladas += ejerciciosFiltrados[i].Calorias
+		if caloriasAcumuladas >= caloriasObjetivo{
 			break
 		}
 	}
-
-	// Verificar si se alcanzaron las calorías objetivo
-	if caloriasAcumuladas < caloriasObjetivo {
-		return nil, errors.New("no es posible alcanzar las calorías objetivo con los ejercicios disponibles")
-	}
-		
+	// Normalizar el nombre de la rutina antes de agregarla
 	nombreNormalizado := NormalizeString(nombre)
-	lista.AgregarRutina(nombreNormalizado,ejerciciosSeleccionados)
-	rutina,_:= lista.ConsultarRutina(nombre)
+	// Agregar la rutina a la lista de rutinas
+	lista.AgregarRutina(nombreNormalizado, ejerciciosSeleccionados)
+	// Consultar y devolver la rutina recién agregada
+	rutina, err := lista.ConsultarRutina(nombreNormalizado)
+	if err != nil {
+		return nil, err
+	}
 	return rutina, nil
 }
 
@@ -328,58 +322,58 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3(nombre string, duracionTotal 
 	nombreNormalizado := NormalizeString(nombre)
 	tipoNormalizado := NormalizeTipoEjercicio(tipo)
 
-	// Filtrar los ejercicios por tipo y que tengan una duración menor o igual a la duración total
-	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(tipoNormalizado, "", duracionTotal)
+	// Filtrar los ejercicios por tipo
+	ejerciciosFiltrados, err := listaEjercicios.FiltrarEjercicios(tipoNormalizado, "", 0)
 	if err != nil {
 		return nil, err
 	}
-
-	// Crear una tabla para almacenar los máximos puntos
-	n := len(ejerciciosFiltrados)
-	dp := make([][]int, n+1)
-	for i := range dp {
-		dp[i] = make([]int, duracionTotal+1)
-	}
-
-	// Llenar la tabla de forma dinámica para maximizar los puntos
-	for i := 1; i <= n; i++ {
-		ejercicio := ejerciciosFiltrados[i-1]
-		puntos := 0
-		for j, t := range ejercicio.TipoDeEjercicio {
-			if t == tipoNormalizado {
-				puntos = ejercicio.PuntosPorTipoDeEjercicio[j]
-				break
-			}
-		}
-		for j := 1; j <= duracionTotal; j++ {
-			if ejercicio.Tiempo <= j {
-				dp[i][j] = max(dp[i-1][j], dp[i-1][j-ejercicio.Tiempo]+puntos)
-			} else {
-				dp[i][j] = dp[i-1][j]
+	// Para ver el valor de puntos en ese tipo específico de ejercicio
+	for _, ejercicio := range ejerciciosFiltrados {
+		for j, tipoEj := range ejercicio.TipoDeEjercicio {
+			if tipoEj == tipo {
+				ejercicio.PuntosPorTipoDeEjercicio = ejercicio.PuntosPorTipoDeEjercicio[j]
 			}
 		}
 	}
 
-	// Recuperar los ejercicios seleccionados que maximizan los puntos dentro de la duración máxima
-	tiempoRestante := duracionTotal
-	rutinaEjercicios := []*Ejercicio{}
-	for i := n; i > 0 && tiempoRestante > 0; i-- {
-		if dp[i][tiempoRestante] != dp[i-1][tiempoRestante] {
-			ejercicio := ejerciciosFiltrados[i-1]
-			rutinaEjercicios = append(rutinaEjercicios, ejercicio)
-			tiempoRestante -= ejercicio.Tiempo
+// Ordenar los ejercicios por mayor puntaje (descendente)
+//SortEjerciciosByPuntosDesc(ejerciciosFiltrados)
+
+	// Seleccionar ejercicios hasta completar la duración total
+	ejerciciosSeleccionados := make([]*Ejercicio, 0)
+	tiempoAcumulado := 0
+	for i := 0; i < len(ejerciciosFiltrados); i++ {
+		if tiempoAcumulado+ejerciciosFiltrados[i].Tiempo <= duracionTotal {
+			ejerciciosSeleccionados = append(ejerciciosSeleccionados, ejerciciosFiltrados[i])
+			tiempoAcumulado += ejerciciosFiltrados[i].Tiempo
+		} else {
+			break
 		}
 	}
-
-	// Validar que se pudieron seleccionar ejercicios
-	if len(rutinaEjercicios) == 0 {
-		return nil, errors.New("no se pudieron seleccionar ejercicios que cumplan con los criterios")
-	}
-
-	// Normalizar el nombre antes de agregar la rutina a la lista
-	lista.AgregarRutina(nombreNormalizado, rutinaEjercicios)
-
-	// Consultar la rutina agregada para devolverla
-	rutina,_ := lista.ConsultarRutina(nombreNormalizado)
-	return rutina, nil
+	// Si no se alcanza la duración total deseada, devolver un error
+	if tiempoAcumulado < duracionTotal {
+	return nil, errors.New("no se puede alcanzar la duración total deseada con los ejercicios disponibles")
 }
+
+	// Agregar la rutina a la lista de rutinas
+	err = lista.AgregarRutina(nombreNormalizado, ejerciciosSeleccionados)
+	if err != nil {
+	return nil, err
+}
+
+	// Consultar y devolver la rutina recién agregada
+	rutina, err := lista.ConsultarRutina(nombreNormalizado)
+	if err != nil {
+	return nil, err
+}
+
+return rutina, nil
+	}
+
+
+// Función para ordenar ejercicios por puntaje (mayor a menor)
+//func SortEjerciciosByPuntosDesc(ejercicios []*Ejercicio) {
+	//sort.Slice(ejercicios, func(i, j int) bool {
+	//	return ejercicios[i].PuntosPorTipoDeEjercicio > ejercicios[j].PuntosPorTipoDeEjercicio
+	//})
+//}
