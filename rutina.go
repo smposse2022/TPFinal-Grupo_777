@@ -218,7 +218,7 @@ func (lista *ListaDeRutinas) EliminaEjercicioDeRutina(nombre string, ejercicio *
 	return nil
 }
 
-// QuickSort
+// QuickSort por tiempo de menor a mayor
 func QuickSort(ejercicios []*Ejercicio, low, high int) {
     if low < high {
         pi := partition(ejercicios, low, high)
@@ -242,6 +242,32 @@ func partition(ejercicios []*Ejercicio, low, high int) int {
 
     ejercicios[i+1], ejercicios[high] = ejercicios[high], ejercicios[i+1]
     return i+1
+}
+
+// QuickSort por puntos de mayor a menor
+func QuickSortPuntos(ejercicios []*Ejercicio, low, high int) {
+	if low < high {
+		pi := partitionPuntos(ejercicios, low, high)
+
+		QuickSortPuntos(ejercicios, low, pi-1)
+		QuickSortPuntos(ejercicios, pi+1, high)
+	}
+}
+
+// Función auxiliar para particionar el slice de ejercicios
+func partitionPuntos(ejercicios []*Ejercicio, low, high int) int {
+	pivot := ejercicios[high].PuntosPorTipoDeEjercicio[0]
+	i := low - 1
+
+	for j := low; j < high; j++ {
+		if ejercicios[j].PuntosPorTipoDeEjercicio[0] > pivot {
+			i++
+			ejercicios[i], ejercicios[j] = ejercicios[j], ejercicios[i]
+		}
+	}
+
+	ejercicios[i+1], ejercicios[high] = ejercicios[high], ejercicios[i+1]
+	return i + 1
 }
 
 func (lista *ListaDeRutinas) GeneracionAutomagica(nombre string, duracionTotal int, tipo TipoEjercicio, dificultad Dificultad, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
@@ -318,8 +344,6 @@ func (lista *ListaDeRutinas) GeneracionAutomagica2(nombre string, caloriasObjeti
 }
 
 func (lista *ListaDeRutinas) GeneracionAutomagica3(nombre string, duracionTotal int, tipo TipoEjercicio, listaEjercicios *ListaDeEjercicios) (*Rutina, error) {
-	// Normalizar los campos
-	nombreNormalizado := NormalizeString(nombre)
 	tipoNormalizado := NormalizeTipoEjercicio(tipo)
 
 	// Filtrar los ejercicios por tipo
@@ -331,13 +355,13 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3(nombre string, duracionTotal 
 	for _, ejercicio := range ejerciciosFiltrados {
 		for j, tipoEj := range ejercicio.TipoDeEjercicio {
 			if tipoEj == tipo {
-				ejercicio.PuntosPorTipoDeEjercicio = ejercicio.PuntosPorTipoDeEjercicio[j]
+				ejercicio.PuntosPorTipoDeEjercicio = []int{ejercicio.PuntosPorTipoDeEjercicio[j]}
+				ejercicio.TipoDeEjercicio = []TipoEjercicio{tipo}
 			}
 		}
 	}
-
-// Ordenar los ejercicios por mayor puntaje (descendente)
-//SortEjerciciosByPuntosDesc(ejerciciosFiltrados)
+	// Ordenar los ejercicios por puntos de mayor a menor
+	QuickSortPuntos(ejerciciosFiltrados, 0, len(ejerciciosFiltrados)-1)
 
 	// Seleccionar ejercicios hasta completar la duración total
 	ejerciciosSeleccionados := make([]*Ejercicio, 0)
@@ -350,30 +374,18 @@ func (lista *ListaDeRutinas) GeneracionAutomagica3(nombre string, duracionTotal 
 			break
 		}
 	}
-	// Si no se alcanza la duración total deseada, devolver un error
-	if tiempoAcumulado < duracionTotal {
-	return nil, errors.New("no se puede alcanzar la duración total deseada con los ejercicios disponibles")
-}
+
+	// Normalizar el nombre de la rutina antes de agregarla
+	nombreNormalizado := NormalizeString(nombre)
 
 	// Agregar la rutina a la lista de rutinas
-	err = lista.AgregarRutina(nombreNormalizado, ejerciciosSeleccionados)
-	if err != nil {
-	return nil, err
-}
-
+	lista.AgregarRutina(nombreNormalizado, ejerciciosSeleccionados)
+	
 	// Consultar y devolver la rutina recién agregada
 	rutina, err := lista.ConsultarRutina(nombreNormalizado)
 	if err != nil {
-	return nil, err
-}
-
-return rutina, nil
+		return nil, err
 	}
 
-
-// Función para ordenar ejercicios por puntaje (mayor a menor)
-//func SortEjerciciosByPuntosDesc(ejercicios []*Ejercicio) {
-	//sort.Slice(ejercicios, func(i, j int) bool {
-	//	return ejercicios[i].PuntosPorTipoDeEjercicio > ejercicios[j].PuntosPorTipoDeEjercicio
-	//})
-//}
+	return rutina, nil
+}
