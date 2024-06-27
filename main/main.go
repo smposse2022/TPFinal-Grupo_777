@@ -116,9 +116,9 @@ func main() {
 				case 7:
 					rutinaDeEjercicios.GeneracionAutomagicaMenu(lista, listaEjercicios)
 				case 8:
-					//rutinaDeEjercicios.GeneracionAutomagica2Menu(lista, listaEjercicios)
+					rutinaDeEjercicios.GeneracionAutomagica2Menu(lista, listaEjercicios)
 				case 9:
-				//	rutinaDeEjercicios.GeneracionAutomagica3v2Menu(lista, listaEjercicios)
+					rutinaDeEjercicios.GeneracionAutomagica3Menu(lista, listaEjercicios)
 				case 10:
 					if err := rutinaDeEjercicios.GuardarRutinas(lista); err != nil {
 						fmt.Println("Error al guardar las rutinas:", err)

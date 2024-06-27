@@ -232,7 +232,7 @@ func GeneracionAutomagicaMenu(lista *ListaDeRutinas, listaEjercicios *ListaDeEje
 		fmt.Println("Error al guardar la rutina:", err)
 	}
 }
-/*
+
 func GeneracionAutomagica2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -268,7 +268,7 @@ func GeneracionAutomagica2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEj
 	}
 }
 
-func GeneracionAutomagica3v2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios) {
+func GeneracionAutomagica3Menu(lista *ListaDeRutinas, listaEjercicios *ListaDeEjercicios) {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Print("Nombre: ")
@@ -293,7 +293,7 @@ func GeneracionAutomagica3v2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDe
 	tipoNormalizado := NormalizeTipoEjercicio(tipoEjercicio)
 
 	// Generar la rutina automágicamente
-	rutina, err := lista.GeneracionAutomagica3v2(NormalizeString(nombre), duracion, tipoNormalizado, listaEjercicios)
+	rutina, err := lista.GeneracionAutomagica3(NormalizeString(nombre), duracion, tipoNormalizado, listaEjercicios)
 	if err != nil {
 		fmt.Println("Error al generar la rutina:", err)
 		return
@@ -310,7 +310,7 @@ func GeneracionAutomagica3v2Menu(lista *ListaDeRutinas, listaEjercicios *ListaDe
 		}
 	}
 }
-	*/
+	
 func GuardarRutinas(lista *ListaDeRutinas) error {
 	rutinas, err := lista.ListarRutinas()
 	if err != nil {
